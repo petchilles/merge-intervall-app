@@ -1,5 +1,6 @@
 <template>
-  <h1>Todo: how to use the app</h1>
+  <h1>Monitoring</h1>
+  <p>Todo</p>
 </template>
 
 <style></style>
