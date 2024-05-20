@@ -23,12 +23,16 @@
       <v-btn id="merge" color="green" class="mt-4" type="submit">Merge</v-btn>
       <v-btn id="reset" color="blue" class="mt-4 ml-4" @click="resetForm">Reset</v-btn>
     </v-form>
-    <h3 id="result_header" v-if="mergedIntervals.length > 0" class="mt-6">Result:</h3>
-    <p v-if="mergedIntervals.length > 0" class="mt-2" id="results">
-      <span v-for="(interval, index) in mergedIntervals" :key="index">
-        {{ `[${interval.start},${interval.end}]` }}
-      </span>
-    </p>
+    <div v-if="mergedIntervals.length > 0">
+      <h3 id="result_header" class="mt-6">Result:</h3>
+      <p class="mt-2" id="results">
+        <span v-for="(interval, index) in mergedIntervals" :key="index">
+          {{ `[${interval.start},${interval.end}]` }}
+        </span>
+      </p>
+      <p class="mt-2" id="runtime"><b>Processing time:</b> {{ runtime }}</p>
+      <p class="mt-2" id="memory"><b>Memory consumption:</b> {{ memory }}</p>
+    </div>
   </v-container>
 </template>
 
@@ -41,6 +45,8 @@ export default defineComponent({
   setup() {
     const intervalsInput = ref('');
     const mergedIntervals = ref<{ start: number; end: number }[]>([]);
+    const runtime = ref<string>('');
+    const memory = ref<string>('');
     const errors = ref<string[]>([]);
 
     // puts form into the initial loading state
@@ -63,6 +69,8 @@ export default defineComponent({
       try {
         const response = await axios.post('http://localhost:8080/merge', { intervals });
         mergedIntervals.value = response.data.result;
+        runtime.value = response.data.elapsed_time;
+        memory.value = response.data.memory_usage;
       } catch (error: any) {
         errors.value.push('A server error occurred');
       }
@@ -110,6 +118,8 @@ export default defineComponent({
     return {
       intervalsInput,
       mergedIntervals,
+      runtime,
+      memory,
       errors,
       submitForm,
       resetForm

@@ -11,7 +11,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"sort"
+	"time"
 
 	"github.com/rs/cors"
 )
@@ -34,7 +36,9 @@ type MergeRequest struct {
 
 // outgoing type
 type MergeResponse struct {
-	Result []Interval `json:"result"`
+	Result       []Interval `json:"result"`
+	ElapsedTime  string     `json:"elapsed_time"`
+	MemoryUsage  string     `json:"memory_usage"`
 }
 
 func loadConfig(filename string) (Config, error) {
@@ -107,9 +111,25 @@ func mergeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// record time and memory usage
+	startTime := time.Now()
+	var memStatsStart runtime.MemStats
+	runtime.ReadMemStats(&memStatsStart)
+
 	// process decoded data using the mergeIntervals function
 	result := mergeIntervals(req.Intervals)
-	resp := MergeResponse{Result: result}
+
+	// measure elapsed time and memory usage
+	elapsedTime := time.Since(startTime)
+	var memStatsEnd runtime.MemStats
+	runtime.ReadMemStats(&memStatsEnd)
+	memoryUsage := memStatsEnd.TotalAlloc - memStatsStart.TotalAlloc
+
+	resp := MergeResponse{
+		Result:      result,
+		ElapsedTime: elapsedTime.String(),
+		MemoryUsage: fmt.Sprintf("%d bytes", memoryUsage),
+	}
 
 	// json encode and send response data
 	w.Header().Set("Content-Type", "application/json")
