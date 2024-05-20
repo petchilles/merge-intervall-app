@@ -90,11 +90,6 @@ func mergeIntervals(intervals []Interval) []Interval {
 	return merged
 }
 
-// helper function for JSON encoding, which can be mocked in tests
-var jsonEncode = func(w http.ResponseWriter, v interface{}) error {
-	return json.NewEncoder(w).Encode(v)
-}
-
 // http handler
 func mergeHandler(w http.ResponseWriter, r *http.Request) {
 	var req MergeRequest

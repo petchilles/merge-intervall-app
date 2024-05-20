@@ -64,8 +64,7 @@ export default defineComponent({
         const response = await axios.post('http://localhost:8080/merge', { intervals });
         mergedIntervals.value = response.data.result;
       } catch (error: any) {
-        // pass on error message from golang backend
-        errors.value.push(error.response.data);
+        errors.value.push('A server error occurred');
       }
     };
 
