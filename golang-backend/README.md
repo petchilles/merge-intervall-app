@@ -34,5 +34,6 @@ go test -v -cover
 ### running test with visual coverage information displayed in a web browser
 
 ```sh
+go test -v -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```

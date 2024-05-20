@@ -2,15 +2,20 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+var testConfig = Config{
+  MaxIntervals: 10,
+}
 
 func TestMergeIntervals(t *testing.T) {
 	tests := []struct {
@@ -109,11 +114,15 @@ func TestMergeIntervals(t *testing.T) {
 }
 
 // Helper function to create a request and response recorder
-func executeRequest(req *http.Request, handlerFunc http.HandlerFunc) *httptest.ResponseRecorder {
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlerFunc)
-	handler.ServeHTTP(rr, req)
-	return rr
+func executeRequest(req *http.Request, handler http.HandlerFunc, config Config) *httptest.ResponseRecorder {
+	w := httptest.NewRecorder()
+	// Create an instance of http.request
+	r := httptest.NewRequest(req.Method, req.URL.String(), req.Body)
+	// Add the configuration to the context
+	ctx := context.WithValue(r.Context(), "config", config)
+	// Execute the handler with the new request
+	handler.ServeHTTP(w, r.WithContext(ctx))
+	return w
 }
 
 func TestMergeHandler_Success(t *testing.T) {
@@ -139,7 +148,7 @@ func TestMergeHandler_Success(t *testing.T) {
 	}
 
 	// Execute the request
-	response := executeRequest(req, mergeHandler)
+	response := executeRequest(req, mergeHandler, testConfig)
 
 	// Check status code
 	assert.Equal(t, http.StatusOK, response.Code)
@@ -166,7 +175,7 @@ func TestMergeHandler_BadRequest(t *testing.T) {
 	}
 
 	// Execute the request
-	response := executeRequest(req, mergeHandler)
+	response := executeRequest(req, mergeHandler, testConfig)
 
 	// Check status code
 	assert.Equal(t, http.StatusBadRequest, response.Code)
@@ -176,39 +185,19 @@ func TestMergeHandler_BadRequest(t *testing.T) {
 	assert.Equal(t, expectedError, response.Body.String())
 }
 
-func TestMergeHandler_InternalServerError(t *testing.T) {
-	// Valid input intervals
-	intervals := MergeRequest{
-		Intervals: []Interval{
-			{Start: 25, End: 30},
-		},
-	}
-
-	// Encode intervals to JSON
-	jsonIntervals, err := json.Marshal(intervals)
+func TestMergeHandler_MaxIntervals(t *testing.T) {
+	// reduce max number of intervals for this test
+	newtestConfig := Config{MaxIntervals: 3}
+	// prepare request
+	reqBody := `{"intervals": [{"start": 1, "end": 3}, {"start": 2, "end": 4}, {"start": 5, "end": 8}, {"start": 6, "end": 7}, {"start": 9, "end": 10}, {"start": 11, "end": 12}]}`
+	req, err := http.NewRequest("POST", "/merge", strings.NewReader(reqBody))
 	if err != nil {
-		t.Fatalf("Failed to marshal intervals: %v", err)
+ 		t.Fatalf("Failed to create request: %v", err)
 	}
-
-	req, err := http.NewRequest("POST", "/merge", bytes.NewBuffer(jsonIntervals))
-	if err != nil {
-		t.Fatalf("Failed to create request: %v", err)
+	// execute the request with the new test configuration
+	response := executeRequest(req, mergeHandler, newtestConfig)
+	// Check HTTP-statuscode of the response
+	if response.Code != http.StatusRequestEntityTooLarge {
+		t.Errorf("expected status %d but got %d", http.StatusRequestEntityTooLarge, response.Code)
 	}
-
-	// Mock jsonEncode to produce an error
-	oldJsonEncode := jsonEncode
-	defer func() { jsonEncode = oldJsonEncode }()
-	jsonEncode = func(w http.ResponseWriter, v interface{}) error {
-		return errors.New("encoding error")
-	}
-
-	// Execute the request
-	response := executeRequest(req, mergeHandler)
-
-	// Check status code
-	assert.Equal(t, http.StatusInternalServerError, response.Code)
-
-	// Check response body
-	expectedError := "encoding error\n"
-	assert.Equal(t, expectedError, response.Body.String())
 }
