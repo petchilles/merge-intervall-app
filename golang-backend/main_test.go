@@ -14,7 +14,7 @@ import (
 )
 
 var testConfig = Config{
-  MaxIntervals: 10,
+	MaxIntervals: 10,
 }
 
 func TestMergeIntervals(t *testing.T) {
@@ -192,7 +192,7 @@ func TestMergeHandler_MaxIntervals(t *testing.T) {
 	reqBody := `{"intervals": [{"start": 1, "end": 3}, {"start": 2, "end": 4}, {"start": 5, "end": 8}, {"start": 6, "end": 7}, {"start": 9, "end": 10}, {"start": 11, "end": 12}]}`
 	req, err := http.NewRequest("POST", "/merge", strings.NewReader(reqBody))
 	if err != nil {
- 		t.Fatalf("Failed to create request: %v", err)
+		t.Fatalf("Failed to create request: %v", err)
 	}
 	// execute the request with the new test configuration
 	response := executeRequest(req, mergeHandler, newtestConfig)
