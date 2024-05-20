@@ -44,8 +44,8 @@ func mergeIntervals(intervals []Interval) []Interval {
       return intervals[i].Start < intervals[j].Start
   })
 
-  //initialise to be returned "merged" slice
-  //with the first item from intervals
+  // initialise to be returned "merged" slice
+  // with the first item from intervals
   merged := []Interval{intervals[0]}
 
   // loop sorted intervals starting from the second item
@@ -68,25 +68,30 @@ func mergeIntervals(intervals []Interval) []Interval {
   return merged
 }
 
+// helper function for JSON encoding, which can be mocked in tests
+var jsonEncode = func(w http.ResponseWriter, v interface{}) error {
+	return json.NewEncoder(w).Encode(v)
+}
+
 // http handler
 func mergeHandler(w http.ResponseWriter, r *http.Request) {
-  var req MergeRequest
+	var req MergeRequest
 
-  // decode json data from reques
-  if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-    http.Error(w, err.Error(), http.StatusBadRequest)
-    return
-  }
+	// decode json data from request
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-  // process decoded data using the mergeIntervals function
-  result := mergeIntervals(req.Intervals)
-  resp := MergeResponse{Result: result}
+	// process decoded data using the mergeIntervals function
+	result := mergeIntervals(req.Intervals)
+	resp := MergeResponse{Result: result}
 
-  // json eoncode and send response data
-  w.Header().Set("Content-Type", "application/json")
-  if err := json.NewEncoder(w).Encode(resp); err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-  }
+	// json encode and send response data
+	w.Header().Set("Content-Type", "application/json")
+	if err := jsonEncode(w, resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // entry point
