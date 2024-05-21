@@ -19,17 +19,20 @@
         label="Intervals"
         v-model="intervalsInput"
         placeholder="[25,30] [2,19] [14,23] [4,8]"
+        id="input"
       ></v-textarea>
       <v-btn id="merge" color="green" class="mt-4" type="submit">Merge</v-btn>
       <v-btn id="reset" color="blue" class="mt-4 ml-4" @click="resetForm">Reset</v-btn>
     </v-form>
-    <div v-if="mergedIntervals.length > 0">
+    <div v-if="mergedIntervalsText">
       <h3 id="result_header" class="mt-6">Result:</h3>
-      <p class="mt-2" id="results">
-        <span v-for="(interval, index) in mergedIntervals" :key="index">
-          {{ `[${interval.start},${interval.end}]` }}
-        </span>
-      </p>
+      <v-textarea
+        class="mt-2"
+        v-model="mergedIntervalsText"
+        readonly
+        rows="10"
+        id="result"
+      ></v-textarea>
       <p class="mt-2" id="runtime"><b>Processing time:</b> {{ runtime }}</p>
       <p class="mt-2" id="memory"><b>Memory consumption:</b> {{ memory }}</p>
     </div>
@@ -43,23 +46,24 @@ import axios from 'axios';
 export default defineComponent({
   name: 'MergeIntervals',
   setup() {
-    const intervalsInput = ref('');
-    const mergedIntervals = ref<{ start: number; end: number }[]>([]);
+    const intervalsInput = ref<string>('');
+    const mergedIntervalsText = ref<string>('');
     const runtime = ref<string>('');
     const memory = ref<string>('');
     const errors = ref<string[]>([]);
+    const mergedIntervals = ref<{ start: number; end: number }>([]);
 
     // puts form into the initial loading state
     const resetForm = () => {
       errors.value = [];
-      mergedIntervals.value = [];
+      mergedIntervalsText.value = '';
       intervalsInput.value = '';
     };
 
     // submits form to backend
     const submitForm = async () => {
       errors.value = [];
-      mergedIntervals.value = [];
+      mergedIntervalsText.value = '';
 
       const intervals = validateIntervals(intervalsInput.value);
       if (errors.value.length > 0) {
@@ -69,10 +73,13 @@ export default defineComponent({
       try {
         const response = await axios.post('http://localhost:8080/merge', { intervals });
         mergedIntervals.value = response.data.result;
+        mergedIntervalsText.value = mergedIntervals.value
+          .map((interval: { start: number; end: number }) => `[${interval.start},${interval.end}]`)
+          .join('');
         runtime.value = response.data.elapsed_time;
         memory.value = response.data.memory_usage;
       } catch (error: any) {
-        errors.value.push('A server error occurred');
+        errors.value.push(error.response?.data || 'A server error occurred');
       }
     };
 
@@ -81,7 +88,8 @@ export default defineComponent({
       // search for invalid input outside of enclosing square brackets
       let nonIntervalMatches = [
         ...input.matchAll(/(\]|^)\s?([^ [\]]+)\s?(\[|$)/g),
-        ...input.matchAll(/(\[\s?([^[\]]+)$)/g)
+        ...input.matchAll(/(\[\s?([^[\]]+)$)/g),
+        ...input.matchAll(/(]([^[\]]+)$)/g)
       ];
       for (const nonIntervalMatch of nonIntervalMatches) {
         errors.value.push(`Not an interval: ${nonIntervalMatch[2]}`);
@@ -116,8 +124,9 @@ export default defineComponent({
     };
 
     return {
-      intervalsInput,
       mergedIntervals,
+      mergedIntervalsText,
+      intervalsInput,
       runtime,
       memory,
       errors,

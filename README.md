@@ -1,6 +1,7 @@
 # merge-intervall-app
 
-This template should help get you started developing with Vue 3 in Vite.
+Provides an intuitive user interface for entering to be merged intervals. Returns merged intervals.
+Comes with unit tests for the MergeIntervals component.
 
 ## Recommended IDE Setup
 
@@ -36,9 +37,11 @@ npm run build
 
 ```sh
 npm run test:unit
+npm run test:coverage
 ```
 
 ### Run End-to-End Tests with [Playwright](https://playwright.dev)
+### (no End-to-End Tests have been implemented as of now)
 
 ```sh
 # Install browsers for the first run

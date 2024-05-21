@@ -37,3 +37,8 @@ go test -v -cover
 go test -v -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```
+
+## generate 1000 random intervals for testing (change number of generated intervals as desired)
+```sh
+go run generator/generate_intervals.go -n 1000
+```

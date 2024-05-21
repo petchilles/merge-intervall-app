@@ -1,5 +1,5 @@
 import { mount, flushPromises } from '@vue/test-utils';
-import MergeIntervals from '@/components/MergeIntervals.vue';
+import MergeIntervals from '../MergeIntervals.vue';
 import { describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -34,11 +34,11 @@ describe('MergeIntervals.vue', () => {
     // mock response
     vi.spyOn(axios, 'post').mockResolvedValue(mockResponse);
 
-    // Data can be entered into the pprovided textarea?
+    // Data can be entered into the provided input textarea?
     const mockInput = '[25,30] [2,19] [14,23] [4,8]';
-    const textarea = wrapper.find('textarea');
-    await textarea.setValue(mockInput);
-    expect(textarea.element.value).toBe(mockInput);
+    const inputTextarea = wrapper.find('#input');
+    await inputTextarea.setValue(mockInput);
+    expect((inputTextarea.element as HTMLTextAreaElement).value).toBe(mockInput);
 
     // Form can be submitted?
     await wrapper.find('form').trigger('submit.prevent');
@@ -70,7 +70,7 @@ describe('MergeIntervals.vue', () => {
 
   it('handles invalid iput data correctly', async () => {
     // enter invalid intervals string
-    const mockInput = 'abc[25,30] [2,19] [14, 23a] def [4,8 ghi';
+    const mockInput = 'abc[25,30][2,19][14, 23a] def [4,8 ghi';
     const textarea = wrapper.find('textarea');
     await textarea.setValue(mockInput);
     expect(textarea.element.value).toBe(mockInput);
@@ -115,7 +115,7 @@ describe('MergeIntervals.vue', () => {
     vi.spyOn(axios, 'post').mockResolvedValue('net::ERR_CONNECTION_REFUSED');
 
     // mock form with valid data and submit
-    const mockInput = '[5,30] [2,4] [4,28]';
+    const mockInput = '[5,30][2,4][4,28]';
     const textarea = wrapper.find('textarea');
     await textarea.setValue(mockInput);
     await wrapper.find('form').trigger('submit.prevent');
