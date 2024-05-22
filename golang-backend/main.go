@@ -140,11 +140,8 @@ func mergeHandler(w http.ResponseWriter, r *http.Request) {
 
 // entry point
 func main() {
-	// Load configuration
-	myConfig, err := loadConfig("config.json")
-	if err != nil {
-		log.Fatalf("Failed to load config: %s\n", err)
-	}
+	// Set configuration for maximum number of intervals
+	myConfig := Config{MaxIntervals: 1000000}
 
 	// Create a ServeMux
 	mux := http.NewServeMux()

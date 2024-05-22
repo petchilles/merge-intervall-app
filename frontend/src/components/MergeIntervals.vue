@@ -51,7 +51,7 @@ export default defineComponent({
     const runtime = ref<string>('');
     const memory = ref<string>('');
     const errors = ref<string[]>([]);
-    const mergedIntervals = ref<{ start: number; end: number }>([]);
+    const mergedIntervals = ref<{ start: number; end: number }[]>([]);
 
     // puts form into the initial loading state
     const resetForm = () => {
@@ -88,8 +88,7 @@ export default defineComponent({
       // search for invalid input outside of enclosing square brackets
       let nonIntervalMatches = [
         ...input.matchAll(/(\]|^)\s?([^ [\]]+)\s?(\[|$)/g),
-        ...input.matchAll(/(\[\s?([^[\]]+)$)/g),
-        ...input.matchAll(/(]([^[\]]+)$)/g)
+        ...input.matchAll(/(\[\s?([^[\]]+)$)/g)
       ];
       for (const nonIntervalMatch of nonIntervalMatches) {
         errors.value.push(`Not an interval: ${nonIntervalMatch[2]}`);
