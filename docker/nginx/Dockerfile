@@ -12,6 +12,7 @@ RUN apk add --no-cache nodejs npm
 # Install frontend dependencies and perform build
 RUN npm install
 RUN npm run build
+RUN npx playwright install
 
 # Production stage
 FROM nginx:stable-alpine

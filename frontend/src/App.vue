@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
   <v-container>
     <main><RouterView /></main>
-    <footer>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/monitoring">Monitoring</RouterLink>
-      </nav>
-    </footer>
   </v-container>
 </template>
 
@@ -26,6 +20,7 @@ v-container {
 
 main {
   min-height: 60vh;
+  width: 50vw;
 }
 
 footer {

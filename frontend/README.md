@@ -1,21 +1,21 @@
-# merge-intervall-app
+# Frontend of the merge-intervall-app
 
 Provides an intuitive user interface for entering to be merged intervals. Returns merged intervals.
 Comes with unit tests for the MergeIntervals component.
 
-## Recommended IDE Setup
+## Setup with Docker:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```sh
+cd into/merge-intervall-app
+docker-compose build
+docker-compose up
+```
 
-## Type Support for `.vue` Imports in TS
+## Setup without Docker: Required for development
+## and runnning unit tests (vitest) and e2e tests (playwright)
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+Note: requires a running golang backend! Please follow the instructions
+of the README in the Folder "golang-backend"
 
 ```sh
 npm install
@@ -65,3 +65,15 @@ npm run test:e2e -- --debug
 ```sh
 npm run lint
 ```
+
+## Recommended IDE Setup
+
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+
+## Type Support for `.vue` Imports in TS
+
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+
+## Customize configuration
+
+See [Vite Configuration Reference](https://vitejs.dev/config/).

@@ -4,10 +4,12 @@
 - runs the algorithm for merging intervals
 - returns the merged intervals back to the frontend
 
-## starting the golang backend
+## starting the golang backend (without Docker)
+
+prerequsites: existing golang installation
 
 ```sh
-cd /into/this/folder
+cd /into/golang-backend
 go run main.go
 ```
 

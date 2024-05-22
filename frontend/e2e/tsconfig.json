@@ -1,4 +1,14 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
-  "include": ["./**/*"]
+  "include": ["./**/*"],
+  "compilerOptions": {
+    "types": [
+      "vitest/globals",
+      "@vitest/browser/providers/webdriverio",
+      "@vitest/browser/providers/playwright"
+    ],
+  },
+  "server": {
+    "port": 3010
+  }
 }
