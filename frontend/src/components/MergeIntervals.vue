@@ -71,7 +71,15 @@ export default defineComponent({
       }
 
       try {
-        const response = await axios.post('http://localhost:8080/merge', { intervals });
+        const response = await axios.post(
+          'http://localhost:8085/merge',
+          { intervals },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         mergedIntervals.value = response.data.result;
         mergedIntervalsText.value = mergedIntervals.value
           .map((interval: { start: number; end: number }) => `[${interval.start},${interval.end}]`)

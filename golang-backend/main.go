@@ -157,10 +157,18 @@ func main() {
 	})
 
 	// Wrap the default mux with the CORS middleware
-	handler := cors.Default().Handler(mux)
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3010", "http://127.0.0.1:3010"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
 
-	log.Println("Server running on port 8080")
-	if err := http.ListenAndServe(":8080", handler); err != nil {
+	handler := corsHandler.Handler(mux)
+
+	log.Println("Server running on port 8085")
+	if err := http.ListenAndServe(":8085", handler); err != nil {
 		log.Fatalf("Could not start server: %s\n", err.Error())
 	}
 }

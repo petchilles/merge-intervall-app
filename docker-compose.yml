@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     working_dir: /app
     ports:
-      - "8085:80"
+      - "8085:8085"
     volumes:
       - ./golang-backend:/usr/share/nginx/
       - ./golang-backend/config.json:/usr/share/nginx/config.json
@@ -17,7 +17,6 @@ services:
 
   nginx:
     build:
-      context: .
       dockerfile: ./docker/nginx/Dockerfile
     container_name: frontend-web
     restart: unless-stopped
@@ -27,7 +26,10 @@ services:
       - ./docker/nginx/frontend.conf:/etc/nginx/conf.d/default.conf
     networks:
       - mergeintervals
+    depends_on:
+      - backend
 
 networks:
   mergeintervals:
+    driver: bridge
     name: mergeintervals
